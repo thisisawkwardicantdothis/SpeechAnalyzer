@@ -1,5 +1,3 @@
-# tests/test_vocabulary.py
-
 def test_vocabulary_returns_result(simple_doc):
     from analyzers.vocabulary import VocabularyAnalyzer
     result = VocabularyAnalyzer().run(simple_doc)
@@ -49,4 +47,13 @@ def test_vocabulary_requires_pos():
 def test_vocabulary_produces_figure(simple_doc):
     from analyzers.vocabulary import VocabularyAnalyzer
     result = VocabularyAnalyzer().run(simple_doc)
-    assert len(result.figures) >= 1
+    assert len(result.figures) >= 3
+
+
+def test_vocabulary_new_metrics(simple_doc):
+    from analyzers.vocabulary import VocabularyAnalyzer
+    result = VocabularyAnalyzer().run(simple_doc)
+    assert "hapax_percent" in result.metrics
+    assert "top_10_words" in result.metrics
+    assert 0.0 <= result.metrics["hapax_percent"] <= 100.0
+    assert isinstance(result.metrics["top_10_words"], dict)

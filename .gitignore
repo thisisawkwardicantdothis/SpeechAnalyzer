@@ -1,5 +1,38 @@
+# Python
 __pycache__/
 *.py[cod]
-.pytest_cache/
-output/
+*.pyo
+*.pyd
 *.egg-info/
+dist/
+build/
+.eggs/
+docs/
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+input/
+output/
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.venv/
+# Output
+output/
+
+# Whisper & spaCy model caches
+*.pt
+*.bin
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db

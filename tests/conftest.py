@@ -1,5 +1,12 @@
+import matplotlib.pyplot as plt
 import pytest
 import spacy
+
+
+@pytest.fixture(autouse=True)
+def close_figures():
+    yield
+    plt.close("all")
 
 @pytest.fixture(scope="session")
 def nlp():

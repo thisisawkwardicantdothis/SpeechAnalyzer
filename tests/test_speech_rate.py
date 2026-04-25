@@ -54,4 +54,15 @@ def test_speech_rate_does_not_require_pos():
 def test_speech_rate_produces_figure(simple_doc):
     from analyzers.speech_rate import SpeechRateAnalyzer
     result = SpeechRateAnalyzer().run(simple_doc)
-    assert len(result.figures) >= 1
+    assert len(result.figures) >= 3
+
+
+def test_speech_rate_new_metrics(simple_doc):
+    from analyzers.speech_rate import SpeechRateAnalyzer
+    result = SpeechRateAnalyzer().run(simple_doc)
+    assert "wpm_std" in result.metrics
+    assert "pause_count" in result.metrics
+    assert "total_pause_seconds" in result.metrics
+    assert "silence_ratio" in result.metrics
+    assert result.metrics["pause_count"] >= 0
+    assert 0.0 <= result.metrics["silence_ratio"] <= 1.0

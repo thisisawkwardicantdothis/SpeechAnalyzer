@@ -45,11 +45,11 @@ class WordcloudAnalyzer(BaseAnalyzer):
     requires_pos = True
 
     def run(self, doc) -> AnalyzerResult:
-        nlp = doc.annotations.get("nlp")
+        nlp = doc.annotations["nlp"]
         weights = _tfidf_weights(doc.segments, nlp)
 
         if not weights:
-            weights = {"(keine Daten)": 1}
+            weights = {"(no data)": 1}
 
         top_words = sorted(weights.items(), key=lambda x: x[1], reverse=True)[:20]
 
@@ -61,13 +61,32 @@ class WordcloudAnalyzer(BaseAnalyzer):
             max_words=100,
         ).generate_from_frequencies(weights)
 
-        fig, ax = plt.subplots(figsize=(10, 5))
-        fig.set_label("wordcloud")
-        ax.imshow(wc, interpolation="bilinear")
-        ax.axis("off")
-        ax.set_title("Wortwolke (TF-IDF gewichtet)")
-        fig.tight_layout()
+        # Figure 1: Word cloud
+        fig1, ax1 = plt.subplots(figsize=(10, 5))
+        fig1.set_label("wordcloud")
+        ax1.imshow(wc, interpolation="bilinear")
+        ax1.axis("off")
+        ax1.set_title("Word cloud (TF-IDF weighted)")
+        fig1.tight_layout()
+
+        # Figure 2: Top-20 bar chart
+        fig2, ax2 = plt.subplots(figsize=(9, 7))
+        fig2.set_label("wordcloud_top20")
+        if top_words:
+            words = [w for w, _ in reversed(top_words)]
+            scores = [s for _, s in reversed(top_words)]
+            colors = [plt.cm.viridis(i / max(len(words) - 1, 1)) for i in range(len(words))]
+            bars = ax2.barh(words, scores, color=colors)
+            for bar, score in zip(bars, scores):
+                ax2.text(
+                    bar.get_width() + max(scores) * 0.01, bar.get_y() + bar.get_height() / 2,
+                    f"{score:.3f}", va="center", fontsize=8,
+                )
+            ax2.set_xlabel("TF-IDF Score")
+            ax2.set_title("Top-20 words by TF-IDF")
+            ax2.margins(x=0.15)
+        fig2.tight_layout()
 
         metrics = {"top_words": dict(top_words[:10])}
-        summary = f"Top-Wörter: {', '.join(w for w, _ in top_words[:5])}"
-        return AnalyzerResult(name=self.name, metrics=metrics, figures=[fig], summary=summary)
+        summary = f"Top words: {', '.join(w for w, _ in top_words[:5])}"
+        return AnalyzerResult(name=self.name, metrics=metrics, figures=[fig1, fig2], summary=summary)
