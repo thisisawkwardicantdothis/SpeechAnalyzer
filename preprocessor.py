@@ -1,7 +1,7 @@
 import spacy
 from spacy.cli import download as spacy_download
 
-from analyzers.base import Segment, TranscriptDoc, SUPPORTED_LANGUAGES
+from analyzers.base import Segment, TranscriptDoc
 
 LANGUAGE_MODELS = {
     "de": "de_core_news_lg",
@@ -21,7 +21,10 @@ def _load_spacy_model(language: str) -> spacy.language.Language:
         return spacy.load(model_name)
     except OSError:
         spacy_download(model_name)
+    try:
         return spacy.load(model_name)
+    except OSError as exc:
+        raise RuntimeError(f"Failed to load spaCy model '{model_name}' after download") from exc
 
 
 def _clean_segments(segments: list) -> list:
